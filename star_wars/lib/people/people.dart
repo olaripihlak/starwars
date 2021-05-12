@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:star_wars/people/people_request.dart';
 import 'package:star_wars/people/people_response.dart';
+import 'package:star_wars/people/person_response.dart';
 
 void main() {
   runApp(MyApp());
@@ -48,23 +49,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
   late Future<PeopleResponse> futurePeople;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     futurePeople = PeopleRequest().requestPeople();
   }
@@ -84,14 +72,23 @@ class _MyHomePageState extends State<MyHomePage> {
           child: FutureBuilder<PeopleResponse>(
             future: futurePeople,
             builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Text(snapshot.data!.count.toString());
+              // ignore: unnecessary_null_comparison
+              if (snapshot.connectionState != ConnectionState.done) {
+                return CircularProgressIndicator();
               } else if (snapshot.hasError) {
                 return Text("${snapshot.error}");
               }
 
-              // By default, show a loading spinner.
-              return CircularProgressIndicator();
+              return ListView.builder(
+                itemCount: snapshot.data!.personResponse.length,
+                itemBuilder: (context, index) {
+                  PersonResponse personResponse =
+                      snapshot.data!.personResponse[index];
+                  return new Card(
+                    child: new Text(personResponse.name),
+                  );
+                },
+              );
             },
           ),
         ),
