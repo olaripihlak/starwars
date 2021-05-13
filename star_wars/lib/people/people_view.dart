@@ -57,14 +57,33 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   late Future<PeopleResponse> futurePeople;
   Database database = Database();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance?.addObserver(this);
     futurePeople = PeopleRequest().requestPeople(database);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance?.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    setState(() {
+      if (state == AppLifecycleState.resumed) {
+        setState(() {
+          futurePeople = PeopleRequest().requestPeople(database);
+        });
+      }
+    });
   }
 
   @override
@@ -82,6 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: FutureBuilder<PeopleResponse>(
             future: futurePeople,
             builder: (context, snapshot) {
+              print("aaaaaaaaa refresh");
               var data = snapshot.data;
               if (snapshot.connectionState != ConnectionState.done) {
                 return CircularProgressIndicator();
