@@ -75,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
             builder: (context, snapshot) {
               if (snapshot.connectionState != ConnectionState.done) {
                 return CircularProgressIndicator();
-              } else if (snapshot.hasError) {
+              } else if (snapshot.hasError || snapshot.data?.personResponse == null) {
                 return Text("${snapshot.error}");
               }
               return ListView.builder(
@@ -86,6 +86,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   return Card(
                     child: new InkWell(
                       onTap: () {
+                        if (snapshot.data?.personResponse[index] == null) {
+                          _showToast(context, "Person is no available");
+                          return;
+                        }
+
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -112,6 +117,17 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
         ),
+      ),
+    );
+  }
+
+  void _showToast(BuildContext context, String message) {
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(
+      SnackBar(
+        content: Text(message),
+        action: SnackBarAction(
+            label: 'Close', onPressed: scaffold.hideCurrentSnackBar),
       ),
     );
   }
