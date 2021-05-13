@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:star_wars/people/people_request.dart';
 import 'package:star_wars/people/people_response.dart';
 import 'package:star_wars/people/person_response.dart';
+import 'package:star_wars/person/person_view.dart';
 
 void main() {
   runApp(MyApp());
@@ -72,20 +73,39 @@ class _MyHomePageState extends State<MyHomePage> {
           child: FutureBuilder<PeopleResponse>(
             future: futurePeople,
             builder: (context, snapshot) {
-              // ignore: unnecessary_null_comparison
               if (snapshot.connectionState != ConnectionState.done) {
                 return CircularProgressIndicator();
               } else if (snapshot.hasError) {
                 return Text("${snapshot.error}");
               }
-
               return ListView.builder(
                 itemCount: snapshot.data!.personResponse.length,
                 itemBuilder: (context, index) {
                   PersonResponse personResponse =
                       snapshot.data!.personResponse[index];
-                  return new Card(
-                    child: new Text(personResponse.name),
+                  return Card(
+                    child: new InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PersonView(
+                                  personResponse:
+                                      snapshot.data!.personResponse[index]),
+                            ));
+                      },
+                      child: Container(
+                        height: 100,
+                        child: Text(
+                          personResponse.name,
+                          style: new TextStyle(
+                              fontSize: 40.0,
+                              color: Colors.black,
+                              backgroundColor: Colors.blue),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
                   );
                 },
               );
