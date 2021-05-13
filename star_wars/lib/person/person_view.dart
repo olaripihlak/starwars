@@ -9,12 +9,11 @@ class PersonView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(personResponse.name),
       ),
-      home: MyPersonView(personResponse: personResponse),
+      body: MyPersonView(personResponse: personResponse),
     );
   }
 }
@@ -31,16 +30,13 @@ class MyPersonView extends StatefulWidget {
 class _MyPersonView extends State<MyPersonView> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: widget.personResponse.name,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return Center(
+      child: ElevatedButton(
+        child: Text(widget.personResponse.name),
+        onPressed: () {
+          Navigator.pop(context);
+        },
       ),
-      home: Scaffold(
-          appBar: AppBar(
-            title: Text(widget.personResponse.name),
-          ),
-          body: Text(widget.personResponse.name)),
     );
   }
 }

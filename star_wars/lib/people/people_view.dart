@@ -101,7 +101,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           child: FutureBuilder<PeopleResponse>(
             future: futurePeople,
             builder: (context, snapshot) {
-              print("aaaaaaaaa refresh");
               var data = snapshot.data;
               if (snapshot.connectionState != ConnectionState.done) {
                 return CircularProgressIndicator();
