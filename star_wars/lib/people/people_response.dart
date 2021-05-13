@@ -1,7 +1,13 @@
+import 'package:hive/hive.dart';
 import 'package:star_wars/people/person_response.dart';
 
-class PeopleResponse {
+part 'people_response.g.dart';
+
+@HiveType(typeId: 1)
+class PeopleResponse extends HiveObject {
+  @HiveField(0)
   final int count;
+  @HiveField(1)
   final List<PersonResponse> personResponse;
 
   PeopleResponse({required this.count, required this.personResponse});

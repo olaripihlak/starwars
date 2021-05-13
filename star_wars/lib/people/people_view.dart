@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:star_wars/database/database.dart';
 import 'package:star_wars/people/people_request.dart';
 import 'package:star_wars/people/people_response.dart';
 import 'package:star_wars/people/person_response.dart';
 import 'package:star_wars/person/person_view.dart';
 
-void main() {
+Future<void> main() async {
   runApp(MyApp());
+  final directory = await getApplicationDocumentsDirectory();
+  Hive.init(directory.path);
+  Hive.registerAdapter(PeopleResponseAdapter());
+  Hive.registerAdapter(PersonResponseAdapter());
 }
 
 class MyApp extends StatelessWidget {
@@ -51,11 +58,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late Future<PeopleResponse> futurePeople;
+  Database database = Database();
 
   @override
   void initState() {
     super.initState();
-    futurePeople = PeopleRequest().requestPeople();
+    futurePeople = PeopleRequest().requestPeople(database);
   }
 
   @override
@@ -73,53 +81,51 @@ class _MyHomePageState extends State<MyHomePage> {
           child: FutureBuilder<PeopleResponse>(
             future: futurePeople,
             builder: (context, snapshot) {
+              var data = snapshot.data;
               if (snapshot.connectionState != ConnectionState.done) {
                 return CircularProgressIndicator();
-              } else if (snapshot.hasError || snapshot.data?.personResponse == null) {
+              } else if (snapshot.hasError || data == null) {
+                // _showToast(context, "${snapshot.error}");
                 return Text("${snapshot.error}");
               }
-              return ListView.builder(
-                itemCount: snapshot.data!.personResponse.length,
-                itemBuilder: (context, index) {
-                  PersonResponse personResponse =
-                      snapshot.data!.personResponse[index];
-                  return Card(
-                    child: new InkWell(
-                      onTap: () {
-                        if (snapshot.data?.personResponse[index] == null) {
-                          _showToast(context, "Person is no available");
-                          return;
-                        }
 
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PersonView(
-                                  personResponse:
-                                      snapshot.data!.personResponse[index]),
-                            ));
-                      },
-                      child: Container(
-                        height: 100,
-                        child: Text(
-                          personResponse.name,
-                          style: new TextStyle(
-                              fontSize: 40.0,
-                              color: Colors.black,
-                              backgroundColor: Colors.blue),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              );
+              return getPeopleListView(data);
             },
           ),
         ),
       ),
     );
   }
+
+  ListView getPeopleListView(PeopleResponse data) => ListView.builder(
+        itemCount: data.personResponse.length,
+        itemBuilder: (context, index) {
+          PersonResponse personResponse = data.personResponse[index];
+          return Card(
+            child: new InkWell(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PersonView(
+                          personResponse: data.personResponse[index]),
+                    ));
+              },
+              child: Container(
+                height: 100,
+                child: Text(
+                  personResponse.name,
+                  style: new TextStyle(
+                      fontSize: 40.0,
+                      color: Colors.black,
+                      backgroundColor: Colors.blue),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          );
+        },
+      );
 
   void _showToast(BuildContext context, String message) {
     final scaffold = ScaffoldMessenger.of(context);
