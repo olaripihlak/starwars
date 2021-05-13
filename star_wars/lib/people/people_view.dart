@@ -7,12 +7,13 @@ import 'package:star_wars/people/people_response.dart';
 import 'package:star_wars/people/person_response.dart';
 import 'package:star_wars/person/person_view.dart';
 
-Future<void> main() async {
-  runApp(MyApp());
+main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   final directory = await getApplicationDocumentsDirectory();
   Hive.init(directory.path);
   Hive.registerAdapter(PeopleResponseAdapter());
   Hive.registerAdapter(PersonResponseAdapter());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
