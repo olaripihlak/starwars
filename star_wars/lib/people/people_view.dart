@@ -58,10 +58,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
+  late Future<PeopleResponse> futurePeople;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance?.addObserver(this);
+    futurePeople = PeopleRequest().requestPeople();
   }
 
   @override
@@ -73,15 +76,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    setState(() {
-      if (state == AppLifecycleState.resumed) {
-        // Refresh data.
-      }
-    });
-  }
-
-  Future<PeopleResponse?> getPeople() async {
-    return await PeopleRequest().requestPeople();
   }
 
   @override
@@ -95,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 
   Widget peopleWidget() {
-    return FutureBuilder<PeopleResponse?>(
+    return FutureBuilder<PeopleResponse>(
       builder: (context, projectSnap) {
         if (projectSnap.connectionState != ConnectionState.done) {
           return Center(
@@ -130,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           },
         ));
       },
-      future: getPeople(),
+      future: futurePeople,
     );
   }
 

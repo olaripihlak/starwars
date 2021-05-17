@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:star_wars/people/people_response.dart';
 
 class PeopleRequest {
-  Future<PeopleResponse?> requestPeople() async {
+  Future<PeopleResponse> requestPeople() async {
     var url = Uri.parse('https://swapi.dev/api/people/');
     try {
       final response = await http.get(url);
