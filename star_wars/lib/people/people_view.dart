@@ -1,6 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:star_wars/database/database.dart';
 import 'package:star_wars/people/people_request.dart';
 import 'package:star_wars/people/people_response.dart';
@@ -9,11 +10,9 @@ import 'package:star_wars/person/person_view.dart';
 
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final directory = await getApplicationDocumentsDirectory();
-  Hive.init(directory.path);
-  Hive.registerAdapter(PeopleResponseAdapter());
-  Hive.registerAdapter(PersonResponseAdapter());
-  runApp(MyApp());
+  Database.instance.initDatabase().then((value) {
+    runApp(MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -58,14 +57,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
-  late Future<PeopleResponse> futurePeople;
-  Database database = Database();
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance?.addObserver(this);
-    futurePeople = PeopleRequest().requestPeople(database);
+    fetchPeople();
+  }
+
+  Future<void> fetchPeople() async {
+    try {
+      await PeopleRequest().requestPeople(Database.instance);
+    } catch (err) {
+      print("fetchPeople error: " + err.toString());
+    }
   }
 
   @override
@@ -79,9 +83,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
     setState(() {
       if (state == AppLifecycleState.resumed) {
-        setState(() {
-          futurePeople = PeopleRequest().requestPeople(database);
-        });
+        // Refresh data.
       }
     });
   }
@@ -89,52 +91,52 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Fetch Data Example',
+      title: 'Starwars',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Fetch Data Example'),
+          title: Text('People'),
         ),
-        body: Center(
-          child: FutureBuilder<PeopleResponse>(
-            future: futurePeople,
-            builder: (context, snapshot) {
-              var data = snapshot.data;
-              if (snapshot.connectionState != ConnectionState.done) {
-                return CircularProgressIndicator();
-              } else if (snapshot.hasError || data == null) {
-                // _showToast(context, "${snapshot.error}");
-                return Text("${snapshot.error}");
-              }
+        body: ValueListenableBuilder(
+          valueListenable: Database.instance.getPeople().listenable(),
+          builder: (context, Box<PeopleResponse> box, _) {
+            //_showToast(context, "df");
+            if (box.values.isEmpty)
+              return Center(
+                child: Text("People list empty"),
+              );
+            List<PersonResponse>? personResponse =
+                box.get(Database.OBJECT_PEOPLE)?.personResponse;
 
-              return getPeopleListView(data);
-            },
-          ),
+            return personResponse == null
+                ? Text("Something went wrong")
+                : getPeopleListView(personResponse);
+          },
         ),
       ),
     );
   }
 
-  ListView getPeopleListView(PeopleResponse data) => ListView.builder(
-        itemCount: data.personResponse.length,
+  ListView getPeopleListView(List<PersonResponse> personResponse) =>
+      ListView.builder(
+        itemCount: personResponse.length,
         itemBuilder: (context, index) {
-          PersonResponse personResponse = data.personResponse[index];
           return Card(
             child: new InkWell(
               onTap: () {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => PersonView(
-                          personResponse: data.personResponse[index]),
+                      builder: (context) =>
+                          PersonView(personResponse: personResponse[index]),
                     ));
               },
               child: Container(
                 height: 100,
                 child: Text(
-                  personResponse.name,
+                  personResponse[index].name,
                   style: new TextStyle(
                       fontSize: 40.0,
                       color: Colors.black,
@@ -146,15 +148,4 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           );
         },
       );
-
-  void _showToast(BuildContext context, String message) {
-    final scaffold = ScaffoldMessenger.of(context);
-    scaffold.showSnackBar(
-      SnackBar(
-        content: Text(message),
-        action: SnackBarAction(
-            label: 'Close', onPressed: scaffold.hideCurrentSnackBar),
-      ),
-    );
-  }
 }
