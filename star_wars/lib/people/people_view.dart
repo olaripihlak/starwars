@@ -7,6 +7,7 @@ import 'package:star_wars/people/people_request.dart';
 import 'package:star_wars/people/people_response.dart';
 import 'package:star_wars/people/person_response.dart';
 import 'package:star_wars/person/person_view.dart';
+import 'package:star_wars/util/SnackBarUtil.dart';
 
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -61,15 +62,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance?.addObserver(this);
-    fetchPeople();
-  }
-
-  Future<void> fetchPeople() async {
-    try {
-      await PeopleRequest().requestPeople(Database.instance);
-    } catch (err) {
-      print("fetchPeople error: " + err.toString());
-    }
   }
 
   @override
@@ -88,34 +80,57 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
   }
 
+  Future<PeopleResponse?> getPeople() async {
+    return await PeopleRequest().requestPeople();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Starwars',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('ProjectList'),
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('People'),
-        ),
-        body: ValueListenableBuilder(
+      body: peopleWidget(),
+    );
+  }
+
+  Widget peopleWidget() {
+    return FutureBuilder<PeopleResponse?>(
+      builder: (context, projectSnap) {
+        if (projectSnap.connectionState != ConnectionState.done) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        if (projectSnap.hasError == true) {
+          WidgetsBinding.instance!.addPostFrameCallback((_) {
+            SnackBarUtil.showSnack(context, projectSnap.error.toString());
+          });
+        }
+
+        PeopleResponse? peopleResponse = projectSnap.data;
+        if (peopleResponse != null) {
+          Database.instance.savePeople(peopleResponse);
+        }
+
+        return Scaffold(
+            body: ValueListenableBuilder(
           valueListenable: Database.instance.getPeople().listenable(),
           builder: (context, Box<PeopleResponse> box, _) {
-            //_showToast(context, "df");
             if (box.values.isEmpty)
               return Center(
                 child: Text("People list empty"),
               );
             List<PersonResponse>? personResponse =
                 box.get(Database.OBJECT_PEOPLE)?.personResponse;
-
             return personResponse == null
                 ? Text("Something went wrong")
                 : getPeopleListView(personResponse);
           },
-        ),
-      ),
+        ));
+      },
+      future: getPeople(),
     );
   }
 
