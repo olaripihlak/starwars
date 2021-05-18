@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:star_wars/database/database.dart';
-import 'package:star_wars/people/people_request.dart';
+import 'package:star_wars/networking/api_service.dart';
 import 'package:star_wars/people/people_response.dart';
 import 'package:star_wars/people/person_response.dart';
 import 'package:star_wars/person/person_view.dart';
@@ -64,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance?.addObserver(this);
-    futurePeople = PeopleRequest().requestPeople();
+    futurePeople = ApiService.instance.requestPeople();
   }
 
   @override
