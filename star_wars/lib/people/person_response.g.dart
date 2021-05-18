@@ -17,16 +17,40 @@ class PersonResponseAdapter extends TypeAdapter<PersonResponse> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return PersonResponse(
-      name: fields[0] as String,
+      name: fields[0] as String?,
+      height: fields[1] as String?,
+      mass: fields[2] as String?,
+      hair_color: fields[3] as String?,
+      skin_color: fields[4] as String?,
+      eye_color: fields[5] as String?,
+      birth_year: fields[6] as String?,
+      gender: fields[7] as String?,
+      homeworld: fields[8] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, PersonResponse obj) {
     writer
-      ..writeByte(1)
+      ..writeByte(9)
       ..writeByte(0)
-      ..write(obj.name);
+      ..write(obj.name)
+      ..writeByte(1)
+      ..write(obj.height)
+      ..writeByte(2)
+      ..write(obj.mass)
+      ..writeByte(3)
+      ..write(obj.hair_color)
+      ..writeByte(4)
+      ..write(obj.skin_color)
+      ..writeByte(5)
+      ..write(obj.eye_color)
+      ..writeByte(6)
+      ..write(obj.birth_year)
+      ..writeByte(7)
+      ..write(obj.gender)
+      ..writeByte(8)
+      ..write(obj.homeworld);
   }
 
   @override

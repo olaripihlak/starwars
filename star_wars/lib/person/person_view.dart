@@ -11,7 +11,7 @@ class PersonView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(personResponse.name),
+        title: Text(personResponse.name.toString()),
       ),
       body: MyPersonView(personResponse: personResponse),
     );
@@ -32,7 +32,7 @@ class _MyPersonView extends State<MyPersonView> {
   Widget build(BuildContext context) {
     return Center(
       child: ElevatedButton(
-        child: Text(widget.personResponse.name),
+        child: Text(widget.personResponse.name.toString()),
         onPressed: () {
           Navigator.pop(context);
         },

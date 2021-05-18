@@ -7,7 +7,7 @@ import 'package:star_wars/people/people_request.dart';
 import 'package:star_wars/people/people_response.dart';
 import 'package:star_wars/people/person_response.dart';
 import 'package:star_wars/person/person_view.dart';
-import 'package:star_wars/util/SnackBarUtil.dart';
+import 'package:star_wars/util/snack_bar_util.dart';
 
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -84,11 +84,11 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       appBar: AppBar(
         title: Text('ProjectList'),
       ),
-      body: peopleWidget(),
+      body: peopleWidget(context),
     );
   }
 
-  Widget peopleWidget() {
+  Widget peopleWidget(BuildContext context) {
     return FutureBuilder<PeopleResponse>(
       builder: (context, projectSnap) {
         if (projectSnap.connectionState != ConnectionState.done) {
@@ -120,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 box.get(Database.OBJECT_PEOPLE)?.personResponse;
             return personResponse == null
                 ? Text("Something went wrong")
-                : getPeopleListView(personResponse);
+                : getPeopleListView(personResponse, context);
           },
         ));
       },
@@ -128,24 +128,24 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     );
   }
 
-  ListView getPeopleListView(List<PersonResponse> personResponse) =>
+  ListView getPeopleListView(
+          List<PersonResponse> personResponse, BuildContext context) =>
       ListView.builder(
         itemCount: personResponse.length,
         itemBuilder: (context, index) {
           return Card(
             child: new InkWell(
               onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          PersonView(personResponse: personResponse[index]),
-                    ));
+                showModalBottomSheet(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return showBottomSheet(context, personResponse[index]);
+                    });
               },
               child: Container(
                 height: 100,
                 child: Text(
-                  personResponse[index].name,
+                  personResponse[index].name ?? "",
                   style: new TextStyle(
                       fontSize: 40.0,
                       color: Colors.black,
@@ -157,4 +157,31 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
           );
         },
       );
+
+  Column showBottomSheet(BuildContext context, PersonResponse personResponse) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Text("name:" + (personResponse.name ?? "")),
+        Text("height:" + (personResponse.height ?? "")),
+        Text("mass:" + (personResponse.mass ?? "")),
+        Text("hair color:" + (personResponse.hair_color ?? "")),
+        Text("skin color:" + (personResponse.skin_color ?? "")),
+        Text("eye color:" + (personResponse.eye_color ?? "")),
+        Text("birth year:" + (personResponse.birth_year ?? "")),
+        Text("gender:" + (personResponse.gender ?? "")),
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      PersonView(personResponse: personResponse),
+                ));
+          },
+          child: Text("home world" + (personResponse.homeworld ?? "")),
+        )
+      ],
+    );
+  }
 }
