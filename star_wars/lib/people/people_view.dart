@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:star_wars/database/database.dart';
+import 'package:star_wars/homeworld/home_world_view.dart';
 import 'package:star_wars/networking/api_service.dart';
 import 'package:star_wars/people/people_response.dart';
 import 'package:star_wars/people/person_response.dart';
-import 'package:star_wars/person/person_view.dart';
 import 'package:star_wars/util/snack_bar_util.dart';
 
 main() async {
@@ -176,7 +176,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
-                      PersonView(personResponse: personResponse),
+                      HomeWorldView(personResponse: personResponse),
                 ));
           },
           child: Text("home world" + (personResponse.homeworld ?? "")),

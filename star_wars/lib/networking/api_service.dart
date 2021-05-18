@@ -29,8 +29,8 @@ class ApiService {
       return throw "Http method not supported";
     }
 
-    var url = Uri.parse(uri);
     try {
+      var url = Uri.parse(uri);
       // Add other methods also e.g http.post().
       final response = await http.get(url);
       if (response.statusCode == 200) {

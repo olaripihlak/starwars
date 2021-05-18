@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:star_wars/people/person_response.dart';
 
-class PersonView extends StatelessWidget {
+class HomeWorldView extends StatelessWidget {
   final PersonResponse personResponse;
 
-  PersonView({Key? key, required this.personResponse}) : super(key: key);
+  HomeWorldView({Key? key, required this.personResponse}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
