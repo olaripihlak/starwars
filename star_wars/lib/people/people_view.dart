@@ -189,8 +189,19 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       HomeWorldView(personResponse: personResponse),
                 ));
           },
-          child: Text("home world" + (personResponse.homeworld ?? "")),
-        )
+          child: Text("home world: " + (personResponse.homeworld ?? "")),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      HomeWorldView(personResponse: personResponse),
+                ));
+          },
+          child: Text('Show home world'),
+        ),
       ],
     );
   }
