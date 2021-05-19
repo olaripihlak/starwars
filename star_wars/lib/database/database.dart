@@ -1,12 +1,16 @@
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:star_wars/homeworld/home_world_response.dart';
 import 'package:star_wars/people/people_response.dart';
 import 'package:star_wars/people/person_response.dart';
 
 class Database {
-  static const String BOX_PEOPLE = "BOX_PEOPLE";
+  static const String BOX_STAR_WARS = "BOX_STAR_WARS";
+  static const String BOX_HOME_WORLD = "BOX_HOME_WORLD";
   static const String OBJECT_PEOPLE = "OBJECT_PEOPLE";
+  static const String OBJECT_HOME_WORLD = "OBJECT_HOME_WORLD";
   Box<PeopleResponse>? peopleBox;
+  Box<HomeWorldResponse>? homeWorldBox;
 
   Database._privateConstructor();
 
@@ -21,14 +25,25 @@ class Database {
     Hive.init(directory.path);
     Hive.registerAdapter(PeopleResponseAdapter());
     Hive.registerAdapter(PersonResponseAdapter());
-    peopleBox = await Hive.openBox<PeopleResponse>(BOX_PEOPLE);
+    Hive.registerAdapter(HomeWorldResponseAdapter());
+    peopleBox = await Hive.openBox<PeopleResponse>(BOX_STAR_WARS);
+    homeWorldBox = await Hive.openBox<HomeWorldResponse>(BOX_HOME_WORLD);
   }
 
   Future<void> savePeople(PeopleResponse peopleResponse) async {
-    Hive.box<PeopleResponse>(BOX_PEOPLE).put(OBJECT_PEOPLE, peopleResponse);
+    Hive.box<PeopleResponse>(BOX_STAR_WARS).put(OBJECT_PEOPLE, peopleResponse);
+  }
+
+  Future<void> saveHomeWorld(HomeWorldResponse homeWorldResponse) async {
+    Hive.box<HomeWorldResponse>(BOX_HOME_WORLD)
+        .put(OBJECT_HOME_WORLD, homeWorldResponse);
   }
 
   Box<PeopleResponse> getPeople() {
-    return Hive.box<PeopleResponse>(BOX_PEOPLE);
+    return Hive.box<PeopleResponse>(BOX_STAR_WARS);
+  }
+
+  Box<HomeWorldResponse> getHomeWorld() {
+    return Hive.box<HomeWorldResponse>(BOX_HOME_WORLD);
   }
 }

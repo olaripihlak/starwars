@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:star_wars/homeworld/home_world_response.dart';
 import 'package:star_wars/people/people_response.dart';
 
 enum RequestMethod {
@@ -21,6 +22,11 @@ class ApiService {
   Future<PeopleResponse> requestPeople() async {
     return apiRequest<PeopleResponse>('https://swapi.dev/api/people/',
         RequestMethod.get, (json) => PeopleResponse.fromJson(json));
+  }
+
+  Future<HomeWorldResponse> requestHomeWorld(String url) async {
+    return apiRequest<HomeWorldResponse>(
+        url, RequestMethod.get, (json) => HomeWorldResponse.fromJson(json));
   }
 
   Future<T> apiRequest<T>(String uri, RequestMethod method,

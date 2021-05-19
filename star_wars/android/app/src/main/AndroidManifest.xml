@@ -1,8 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.star_wars">
-   <application
+
+    <application
+        android:icon="@mipmap/ic_launcher"
         android:label="star_wars"
-        android:icon="@mipmap/ic_launcher">
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
