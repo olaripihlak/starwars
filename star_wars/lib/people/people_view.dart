@@ -2,17 +2,25 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:star_wars/database/database.dart';
 import 'package:star_wars/homeworld/home_world_view.dart';
 import 'package:star_wars/networking/api_service.dart';
+import 'package:star_wars/people/people_model.dart';
 import 'package:star_wars/people/people_response.dart';
 import 'package:star_wars/people/person_response.dart';
+import 'package:star_wars/ui/constants.dart';
 import 'package:star_wars/util/snack_bar_util.dart';
 
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Database.instance.initDatabase().then((value) {
-    runApp(MyApp());
+    runApp(
+      ChangeNotifierProvider(
+        create: (context) => PeopleModel(),
+        child: MyApp(),
+      ),
+    );
   });
 }
 
@@ -20,21 +28,14 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+    return Consumer<PeopleModel>(
+      builder: (context, cart, child) {
+        return MaterialApp(
+          title: 'Flutter Demo',
+          theme: cart.lightMode ? lightTheme : darkTheme,
+          home: MyHomePage(title: 'Flutter Demo Home Page'),
+        );
+      },
     );
   }
 }
@@ -83,6 +84,13 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     return Scaffold(
       appBar: AppBar(
         title: Text('ProjectList'),
+        actions: [
+          Switch(
+              value: context.read<PeopleModel>().lightMode,
+              onChanged: (val) {
+                context.read<PeopleModel>().setIsLightMode(val);
+              }),
+        ],
       ),
       body: peopleWidget(context),
     );
@@ -146,10 +154,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                 height: 100,
                 child: Text(
                   personResponse[index].name ?? "",
-                  style: new TextStyle(
-                      fontSize: 40.0,
-                      color: Colors.black,
-                      backgroundColor: Colors.blue),
+                  style: new TextStyle(fontSize: 40.0),
                   textAlign: TextAlign.center,
                 ),
               ),
