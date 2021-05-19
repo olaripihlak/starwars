@@ -32,7 +32,8 @@ class MyApp extends StatelessWidget {
       builder: (context, cart, child) {
         return MaterialApp(
           title: 'Flutter Demo',
-          theme: cart.lightMode ? lightTheme : darkTheme,
+          theme:
+              cart.lightMode ? getLightTheme(context) : getDarkTheme(context),
           home: MyHomePage(title: 'Flutter Demo Home Page'),
         );
       },
@@ -83,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ProjectList'),
+        title: Text('Starwars'),
         actions: [
           Switch(
               value: context.read<PeopleModel>().lightMode,
@@ -142,19 +143,23 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
         itemCount: personResponse.length,
         itemBuilder: (context, index) {
           return Card(
-            child: new InkWell(
-              onTap: () {
-                showModalBottomSheet(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return showBottomSheet(context, personResponse[index]);
-                    });
-              },
-              child: Container(
-                height: 100,
+            color: context.read<PeopleModel>().lightMode
+                ? cardBgColorLight
+                : cardBgColorDark,
+            margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: InkWell(
+                onTap: () {
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return showBottomSheet(context, personResponse[index]);
+                      });
+                },
                 child: Text(
                   personResponse[index].name ?? "",
-                  style: new TextStyle(fontSize: 40.0),
+                  style: TextStyle(fontSize: 40.0),
                   textAlign: TextAlign.center,
                 ),
               ),
