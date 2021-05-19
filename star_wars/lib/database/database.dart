@@ -8,7 +8,6 @@ class Database {
   static const String BOX_STAR_WARS = "BOX_STAR_WARS";
   static const String BOX_HOME_WORLD = "BOX_HOME_WORLD";
   static const String OBJECT_PEOPLE = "OBJECT_PEOPLE";
-  static const String OBJECT_HOME_WORLD = "OBJECT_HOME_WORLD";
   Box<PeopleResponse>? peopleBox;
   Box<HomeWorldResponse>? homeWorldBox;
 
@@ -34,9 +33,9 @@ class Database {
     Hive.box<PeopleResponse>(BOX_STAR_WARS).put(OBJECT_PEOPLE, peopleResponse);
   }
 
-  Future<void> saveHomeWorld(HomeWorldResponse homeWorldResponse) async {
-    Hive.box<HomeWorldResponse>(BOX_HOME_WORLD)
-        .put(OBJECT_HOME_WORLD, homeWorldResponse);
+  Future<void> saveHomeWorld(
+      String id, HomeWorldResponse homeWorldResponse) async {
+    Hive.box<HomeWorldResponse>(BOX_HOME_WORLD).put(id, homeWorldResponse);
   }
 
   Box<PeopleResponse> getPeople() {

@@ -65,7 +65,8 @@ class _MyHomeWorldView extends State<MyHomeWorldView> {
 
         HomeWorldResponse? homeWorldResponse = projectSnap.data;
         if (homeWorldResponse != null) {
-          Database.instance.saveHomeWorld(homeWorldResponse);
+          Database.instance.saveHomeWorld(
+              widget.personResponse.homeworld!, homeWorldResponse);
         }
 
         return Scaffold(
@@ -77,7 +78,7 @@ class _MyHomeWorldView extends State<MyHomeWorldView> {
                 child: Text("Home world not found!"),
               );
             HomeWorldResponse? homeWorldResponse =
-                box.get(Database.OBJECT_HOME_WORLD);
+                box.get(widget.personResponse.homeworld!);
             return Text(homeWorldResponse?.name?.toString() ?? "No name");
           },
         ));
